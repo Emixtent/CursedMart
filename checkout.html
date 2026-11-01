@@ -10,17 +10,30 @@
         h1 { margin-top: 0; text-transform: uppercase; font-size: 2rem; }
         .order-summary { background: #000; padding: 20px; margin: 20px 0; border: 1px dashed #555; text-align: left; }
         .btc-address { background: #000; padding: 15px; word-break: break-all; border: 1px dashed #ff003c; margin: 20px 0; font-size: 1rem; user-select: all; color: #33ff33; }
-        .status { color: #ffaa00; font-size: 0.9rem; animation: blink 1.5s infinite; margin-bottom: 30px; }
+        .status { color: #ffaa00; font-size: 0.9rem; animation: blink 1.5s infinite; margin-bottom: 20px; }
+        
+        /* New Input and Verify Button Styles */
+        .tx-input { width: 100%; padding: 12px; background: #000; border: 1px solid #ff003c; color: #33ff33; font-family: inherit; margin-bottom: 15px; box-sizing: border-box; text-align: center; }
+        .tx-input:focus { outline: none; box-shadow: 0 0 10px #ff003c; }
+        
+        .verify-btn { background: #ff003c; color: #000; border: 1px solid #ff003c; padding: 12px 20px; cursor: pointer; font-family: inherit; text-transform: uppercase; width: 100%; transition: 0.2s; font-size: 1rem; font-weight: bold; margin-bottom: 10px; }
+        .verify-btn:hover { background: #fff; color: #000; border-color: #fff; }
         
         .cancel-btn { background: transparent; color: #888; border: 1px solid #888; padding: 12px 20px; cursor: pointer; font-family: inherit; text-transform: uppercase; width: 100%; transition: 0.2s; font-size: 1rem; }
         .cancel-btn:hover { color: #ff003c; border-color: #ff003c; }
+
+        /* Success Screen Styles */
+        .success-screen { display: none; color: #33ff33; border-color: #33ff33; box-shadow: 0 0 20px #33ff33; }
+        .success-screen h1 { color: #33ff33; text-shadow: 0 0 10px #33ff33; margin-bottom: 10px; }
+        .delivery-text { font-size: 1.2rem; margin: 30px 0; border: 1px dashed #33ff33; padding: 30px; background: #000; }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="checkout-container">
+    <!-- Phase 1: Payment Screen -->
+    <div class="checkout-container" id="payment-screen">
         <h1>Initiating Transfer</h1>
         
         <div class="order-summary">
@@ -37,10 +50,31 @@
         </div>
 
         <p class="status">Awaiting blockchain confirmations [0/3]...</p>
+        
+        <!-- The New Input Box -->
+        <input type="text" id="txid-input" class="tx-input" placeholder="Paste Transaction ID (TXID) here...">
+        <button class="verify-btn" onclick="verifyTransaction()">VERIFY PAYMENT</button>
         <button class="cancel-btn" onclick="window.location.href='index.html'">ABORT TRANSACTION</button>
     </div>
 
+    <!-- Phase 2: Order Confirmed Screen (Hidden by default) -->
+    <div class="checkout-container success-screen" id="success-screen">
+        <h1>PAYMENT VERIFIED</h1>
+        <p>Transaction confirmed on the blockchain.</p>
+        
+        <div class="delivery-text">
+            <strong>ITEM SECURED</strong><br><br>
+            Expected drop-off:<br>
+            <span style="font-size: 2rem; color: #fff; display: inline-block; margin-top: 10px;">3 DAYS</span>
+        </div>
+        
+        <p style="color: #888; font-size: 0.9rem; margin-bottom: 30px;">Do not interact with the delivery courier. They do not know what is in the package.</p>
+        
+        <button class="cancel-btn" style="border-color: #33ff33; color: #33ff33;" onclick="window.location.href='index.html'">RETURN TO MAIN CATALOG</button>
+    </div>
+
     <script>
+        // Load item data from localStorage
         let itemData = JSON.parse(localStorage.getItem('cursedItem'));
         
         if (!itemData) {
@@ -48,6 +82,21 @@
         } else {
             document.getElementById('checkout-title').innerText = itemData.title;
             document.getElementById('checkout-price').innerText = itemData.price + ' BTC';
+        }
+
+        // Fake Verification Logic
+        function verifyTransaction() {
+            let txid = document.getElementById('txid-input').value;
+            
+            // Require them to type at least something in the box
+            if (txid.trim() === "") {
+                alert("ERROR: Please enter a valid Transaction ID.");
+                return;
+            }
+
+            // Hide the red payment screen and show the green success screen
+            document.getElementById('payment-screen').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'block';
         }
     </script>
 </body>
